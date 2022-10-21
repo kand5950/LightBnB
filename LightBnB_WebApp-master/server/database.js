@@ -133,6 +133,19 @@ exports.getAllReservations = getAllReservations;
     queryString += `WHERE LOWER(city) LIKE $${queryParams.length} `;
   }
 
+  if (options.minimum_price_per_night && options.maximum_price_per_night) {
+    queryParams.push(`${options.minimum_price_per_night*100}`, `${options.maximum_price_per_night*100}`)
+    if (queryParams.length === 1) {
+    queryString += `WHERE cost_per_night >= $${queryParams.length-1} AND cost_per_night <= $${queryParams.length} `;
+  } else {
+    queryString += `AND cost_per_night >= $${queryParams.length-1} AND cost_per_night <= $${queryParams.length} `;
+  }
+}
+
+  // if(options.minimum_rating) {
+  //   queryParams.push(`${options.minimum_rating}`);
+  //   queryString += `WHERE avg(property_reviews.rating) >= $${queryParams.length-1}`
+  // }
 
   queryParams.push(limit);
   queryString += `
