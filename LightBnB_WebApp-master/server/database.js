@@ -53,7 +53,7 @@ const getUserWithId = function(id) {
 
   return pool.query(queryString, values)
     .then((result) => {
-      return result.rows[0];
+      return result.rows[0] || null;
     })
     .catch(err => err);
 }
