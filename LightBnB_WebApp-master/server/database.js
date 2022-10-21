@@ -18,18 +18,24 @@ const users = require('./json/users.json');
  * @param {String} email The email of the user.
  * @return {Promise<{}>} A promise to the user.
  */
-const getUserWithEmail = function(email) {
-  let user;
-  for (const userId in users) {
-    user = users[userId];
-    if (user.email.toLowerCase() === email.toLowerCase()) {
-      break;
-    } else {
-      user = null;
-    }
-  }
-  return Promise.resolve(user);
-}
+const getUserWithEmail = (email) =>  {
+
+  const queryString = `
+  SELECT * 
+  FROM users
+  WHERE email = $1`;
+
+  const values = [email];
+
+  return pool.query(queryString, values)
+    .then((result) => {
+      console.log(result.rows[0] || null);
+      return result.rows[0];
+    })
+    .catch((err) => {
+      console.log(err.message);
+    });
+};
 exports.getUserWithEmail = getUserWithEmail;
 
 /**
@@ -38,7 +44,18 @@ exports.getUserWithEmail = getUserWithEmail;
  * @return {Promise<{}>} A promise to the user.
  */
 const getUserWithId = function(id) {
-  return Promise.resolve(users[id]);
+  const queryString = `
+  SELECT *
+  FROM users
+  WHERE id = $1`
+
+  const values = [id]
+
+  return pool.query(queryString, values)
+    .then((result) => {
+      return result.rows[0];
+    })
+    .catch(err => err);
 }
 exports.getUserWithId = getUserWithId;
 
@@ -77,10 +94,17 @@ exports.getAllReservations = getAllReservations;
  * @return {Promise<[{}]>}  A promise to the properties.
  */
  const getAllProperties = (options, limit = 10) => {
-  return pool
-    .query(`SELECT * FROM properties LIMIT $1`, [limit])
+
+  const queryString = `
+  SELECT * 
+  FROM properties 
+  LIMIT $1
+  `;
+
+  const values = [limit];
+
+  return pool.query(queryString, values)
     .then((result) => {
-      console.log(result.rows);
       return result.rows;
     })
     .catch((err) => {
